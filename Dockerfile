@@ -1,8 +1,11 @@
-ARG ARCH=
-FROM ${ARCH}debian:buster-slim
+FROM golang:alpine AS builder
+RUN mkdir /app
+ADD . /app/
+WORKDIR /app
+RUN go build -o hello .
 
-RUN apt-get update \
-&& apt-get install -y curl \
-&& rm -rf /var/lib/apt/lists/*
-
-ENTRYPOINT [ "curl" ]
+FROM alpine
+RUN mkdir /app
+WORKDIR /app
+COPY --from=builder /app/hello .
+CMD ["./hello"]
